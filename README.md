@@ -3,6 +3,13 @@
 `mindock` is a minimal, programmable dock for herbstluftwm (and possibly other
 tiling WMs).
 
+Screenshot - it's quite unimpressive :) :
+
+![mindock screenshot](https://raw.github.com/xiaq/mindock/master/screenshot.png)
+
+Windows are roxterm, firefox, kupfer and leafpad, with kupfer being the active
+one.
+
 ## Why another dock?
 
 [EWMH](http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html) defines 2
