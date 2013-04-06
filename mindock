@@ -9,6 +9,14 @@ import glib
 import wnck
 
 
+default_config = dict(
+    height=20,
+    spacing=2,
+    active_bg=0x00a00000,
+    inactive_bg=0x00ffffff,
+)
+
+
 class AppIcon(gtk.DrawingArea):
 
     def on_expose(self, widget, event):
@@ -20,15 +28,17 @@ class AppIcon(gtk.DrawingArea):
     def on_button_press(self, widget, event):
         self.xwindow.activate(gtk.gdk.x11_get_server_time(self.window))
 
-    def __init__(self, xwindow, height):
+    def __init__(self, xwindow, config):
         super(AppIcon, self).__init__()
+
+        height = config['height']
 
         self.xwindow = xwindow
 
         if xwindow.is_active():
-            bg = 0x00a00000
+            bg = config['active_bg']
         else:
-            bg = 0x00ffffff
+            bg = config['inactive_bg']
 
         self.pixbuf = xwindow.get_icon().composite_color_simple(
             height, height, gtk.gdk.INTERP_HYPER, 0xff, 32, bg, bg)
@@ -69,7 +79,7 @@ class MainWindow(gtk.Window):
         for w in self.screen.get_windows():
             wid = w.get_xid()
             if wid in wid_subs:
-                icons[wid_subs[wid]] = AppIcon(w, self.config['height'])
+                icons[wid_subs[wid]] = AppIcon(w, self.config)
 
         self.icons_box.foreach(lambda w: w.destroy())
 
@@ -110,7 +120,7 @@ class MainWindow(gtk.Window):
         self.box = gtk.HBox()
         self.add(self.box)
 
-        self.icons_box = gtk.HBox(spacing=2)
+        self.icons_box = gtk.HBox(spacing=config['spacing'])
         self.box.pack_end(self.icons_box)
 
         self.show_all()
@@ -119,8 +129,9 @@ class MainWindow(gtk.Window):
 
 def main():
     #logging.basicConfig(filename='logging.ini')
+    config = default_config
 
-    mw = MainWindow({'height': 20})
+    mw = MainWindow(config)
     glib.io_add_watch(0, glib.IO_IN, mw.on_stdin_data)
     glib.io_add_watch(0, glib.IO_ERR, mw.on_stdin_err)
     glib.io_add_watch(0, glib.IO_HUP, mw.on_stdin_hup)
