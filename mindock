@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 import sys
+import os.path
 import logging
 
 import pygtk
@@ -8,12 +9,22 @@ import gtk
 import glib
 import wnck
 
+from xdg.BaseDirectory import load_first_config
+
 
 default_config = dict(
     height=20,
     spacing=2,
     active_bg=0x00a00000,
     inactive_bg=0x00ffffff,
+    place_x='center',
+    place_y='top',
+    logging=dict(
+        level=logging.WARNING,
+        format='\033[4m%(asctime)s\033[m \033[35m%(levelname)s\033[m '
+               '\033[33m%(name)s:%(lineno)d\033[m %(message)s',
+        datefmt='%T',
+    )
 )
 
 
@@ -49,6 +60,33 @@ class AppIcon(gtk.DrawingArea):
         self.connect('button-press-event', self.on_button_press)
 
 
+placement_presets = dict(
+    top=lambda total, my: 0,
+    bottom=lambda total, my: total - my,
+    center=lambda total, my: (total - my) / 2
+)
+placement_presets['left'] = placement_presets['top']
+placement_presets['right'] = placement_presets['bottom']
+
+
+def parse_placement(p, fallback):
+    if callable(p):
+        try:
+            p(768, 20)
+        except err:
+            logging.error('Placement function throws an exception when '
+                          'called with (768, 20). Falling back to %r' % (
+                              p, fallback))
+            logging.exception(err)
+        else:
+            return p
+    elif p in placement_presets:
+        return placement_presets[p]
+    logging.error('Bad placement specifier %r, falling back to %r' % (
+        p, fallback))
+    return placement_presets[fallback]
+
+
 class MainWindow(gtk.Window):
 
     def resize(self):
@@ -58,7 +96,9 @@ class MainWindow(gtk.Window):
     def on_configure_event(self, widget, event):
         #self.move(gtk.gdk.screen_width() - event.width,
         #          gtk.gdk.screen_height() - event.height)
-        self.move(700, 0)
+        x = self.place_x(gtk.gdk.screen_width(), event.width)
+        y = self.place_y(gtk.gdk.screen_height(), event.height)
+        self.move(x, y)
 
     def on_stdin_data(self, fd, condition):
         line = sys.stdin.readline()
@@ -107,6 +147,8 @@ class MainWindow(gtk.Window):
     def __init__(self, config):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.config = config
+        self.place_x = parse_placement(config['place_x'], 'center')
+        self.place_y = parse_placement(config['place_y'], 'top')
 
         self.set_decorated(False)
         self.connect('destroy', lambda w: gtk.main_quit())
@@ -128,8 +170,33 @@ class MainWindow(gtk.Window):
 
 
 def main():
-    #logging.basicConfig(filename='logging.ini')
-    config = default_config
+    logging.basicConfig(**default_config['logging'])
+    #logging.basicConfig(level=logging.WARNING)
+
+    config = default_config.copy()
+
+    config_dir = load_first_config('mindock')
+    if config_dir:
+        config_file = os.path.join(config_dir, 'config.py')
+        if os.path.exists(config_file):
+            user_config = {}
+            try:
+                execfile(config_file, user_config)
+            except err:
+                logging.error('error evaluating configuration file %s, '
+                              'traceback: ' % config_file)
+                logging.exception(err)
+                logging.info('using default configuration')
+            else:
+                config.update(user_config)
+                if 'logging' in user_config:
+                    logging.basicConfig(user_config['logging'])
+        else:
+            logging.info('configuration directory present but config.py not')
+            logging.info('using default configuration')
+    else:
+        logging.info('configuration directory not present, '
+                     'using default config')
 
     mw = MainWindow(config)
     glib.io_add_watch(0, glib.IO_IN, mw.on_stdin_data)
