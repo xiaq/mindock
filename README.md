@@ -46,9 +46,7 @@ It's obvious that a lot is missing, but it's already usable for me. :)
 Planned:
 
 * `setup.py` things
-
 * Prettier look (transparency, highlight effect, etc.)
-
 * Support simple elements other than window icons (separators, etc.)
 
 Probably:
@@ -58,5 +56,4 @@ Probably:
 _Not_ planned:
 
 * System tray
-
 * Graphical configuration interface
