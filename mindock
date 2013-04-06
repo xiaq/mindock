@@ -1,0 +1,129 @@
+#!/usr/bin/python2
+import sys
+import math
+import logging
+
+import pygtk; pygtk.require('2.0')
+import gtk
+import glib
+import wnck
+
+
+class AppIcon(gtk.DrawingArea):
+
+    def on_expose(self, widget, event):
+        cr = widget.window.cairo_create()
+        cr.set_source_pixbuf(self.pixbuf, 0, 0)
+        cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
+        cr.fill()
+
+    def on_button_press(self, widget, event):
+        self.xwindow.activate(gtk.gdk.x11_get_server_time(self.window))
+
+    def __init__(self, xwindow, height):
+        super(AppIcon, self).__init__()
+
+        self.xwindow = xwindow
+
+        if xwindow.is_active():
+            bg = 0x00a00000
+        else:
+            bg = 0x00ffffff
+
+        self.pixbuf = xwindow.get_icon().composite_color_simple(
+            height, height, gtk.gdk.INTERP_HYPER, 0xff, 32, bg, bg)
+
+        self.set_size_request(height, height)
+        self.connect('expose-event', self.on_expose)
+        self.set_events(self.get_events() | gtk.gdk.BUTTON_PRESS_MASK)
+        self.connect('button-press-event', self.on_button_press)
+
+
+class MainWindow(gtk.Window):
+
+    def resize(self):
+        # request minumum width
+        super(MainWindow, self).resize(1, self.config['height'])
+
+    def on_configure_event(self, widget, event):
+        #self.move(gtk.gdk.screen_width() - event.width,
+        #          gtk.gdk.screen_height() - event.height)
+        self.move(700, 0)
+
+    def on_stdin_data(self, fd, condition):
+        line = sys.stdin.readline()
+        try:
+            wids = map(lambda s: int(s, 0), line.strip().split())
+        except:
+            logging.error('malformed input line: %r' % line)
+            # see comment at end of function
+            return True
+        logging.debug('got wids: %r' % wids)
+        n = len(wids)
+        wid_subs = {}
+        for i in range(n):
+            wid_subs[wids[i]] = i
+
+        icons = [None] * n
+
+        for w in self.screen.get_windows():
+            wid = w.get_xid()
+            if wid in wid_subs:
+                icons[wid_subs[wid]] = AppIcon(w, self.config['height'])
+
+        self.icons_box.foreach(lambda w: w.destroy())
+
+        for icon in icons:
+            if icon:
+                self.icons_box.pack_start(icon, False, False, 0)
+                icon.show()
+
+        self.resize()
+
+        # glib requires the callback to return True to indicate that further
+        # events should be listened. Otherwise the event source is removed.
+        return True
+
+    def on_stdin_err(self, fd, condition):
+        logging.error('error on stdin')
+        gtk.main_quit()
+        return False
+
+    def on_stdin_hup(self, fd, condition):
+        logging.debug('stdin closed')
+        gtk.main_quit()
+        return False
+
+    def __init__(self, config):
+        super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
+        self.config = config
+
+        self.set_decorated(False)
+        self.connect('destroy', lambda w: gtk.main_quit())
+        self.resize()
+
+        self.connect('configure-event', self.on_configure_event)
+
+        self.screen = wnck.screen_get_default()
+        self.screen.force_update()
+
+        self.box = gtk.HBox()
+        self.add(self.box)
+
+        self.icons_box = gtk.HBox(spacing=2)
+        self.box.pack_end(self.icons_box)
+
+        self.show_all()
+        self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
+
+
+if __name__ == '__main__':
+    #logging.basicConfig(filename='logging.ini')
+
+    mw = MainWindow({'height': 20})
+    glib.io_add_watch(0, glib.IO_IN, mw.on_stdin_data)
+    glib.io_add_watch(0, glib.IO_ERR, mw.on_stdin_err)
+    glib.io_add_watch(0, glib.IO_HUP, mw.on_stdin_hup)
+    gtk.main()
+
+    logging.shutdown()
