@@ -28,9 +28,11 @@ continuously, and when there is a new line of input, it parses it as a list of
 X window IDs. Icons for these windows are then displayed, with the active
 window in a different background.
 
-What this implies is that your WM has to be scriptable so that you can
-monitor and output the list of windows in the first place. I develop this dock
-under [herbstluftwm](http://wwwcip.cs.fau.de/~re06huxa/herbstluftwm/) and for
+Therefore this requires that you write a script for monitor the list of window
+IDs on current workspace, which implies is that your WM has to be scriptable
+so that you can monitor and output the list of windows in the first place. I
+develop this dock under
+[herbstluftwm](http://wwwcip.cs.fau.de/~re06huxa/herbstluftwm/)(hlwm) and for
 hlwm; `hlwm-monitor-wid` is a reference bash script just for that.
 
 To use with hlwm, just run
