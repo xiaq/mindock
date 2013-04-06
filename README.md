@@ -1,4 +1,7 @@
-# A minimal, programmable dock for herbstluftwm (and possibly other tiling WMs)
+# mindock
+
+`mindock` is a minimal, programmable dock for herbstluftwm (and possibly other
+tiling WMs).
 
 ## Why another dock?
 
@@ -16,7 +19,7 @@ the WM can indicate the navigation order under this condition.
 
 ## Why not just use a list of window names?
 
-Docks are much more scalable.
+Docks are much more scalable and intuitive.
 
 ## How it works
 
