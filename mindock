@@ -1,9 +1,9 @@
 #!/usr/bin/python2
 import sys
-import math
 import logging
 
-import pygtk; pygtk.require('2.0')
+import pygtk
+pygtk.require('2.0')
 import gtk
 import glib
 import wnck
