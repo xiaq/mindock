@@ -17,7 +17,7 @@ of navigation is likely changed too. In that case the navigation order becomes
 inconsistent with `_NET_CLIENT_LIST`. Unfortunately, there seems to be no way
 the WM can indicate the navigation order under this condition.
 
-## Why not just use a list of window names?
+## Why dock at all? Why not just display a list of window names in dzen?
 
 Docks are much more scalable and intuitive.
 
@@ -39,6 +39,22 @@ To use with hlwm, just run
 
     ./hlwm-monitor-wid | ./mindock
 
-## Status
+## Roadmap
 
 It's obvious that a lot is missing, but it's already usable for me. :)
+
+Planned:
+
+* `setup.py` things
+
+* Prettier look (transparency, highlight effect, etc.)
+
+Probably:
+
+* Make icon clicking actually work :)
+
+_Not_ planned:
+
+* System tray
+
+* Graphical configuration interface
