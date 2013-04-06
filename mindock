@@ -117,7 +117,7 @@ class MainWindow(gtk.Window):
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
 
 
-if __name__ == '__main__':
+def main():
     #logging.basicConfig(filename='logging.ini')
 
     mw = MainWindow({'height': 20})
@@ -127,3 +127,7 @@ if __name__ == '__main__':
     gtk.main()
 
     logging.shutdown()
+
+
+if __name__ == '__main__':
+    main()
