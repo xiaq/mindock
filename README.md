@@ -49,6 +49,8 @@ Planned:
 
 * Prettier look (transparency, highlight effect, etc.)
 
+* Support simple elements other than window icons (separators, etc.)
+
 Probably:
 
 * Make icon clicking actually work :)
