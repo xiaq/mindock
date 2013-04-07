@@ -42,7 +42,7 @@ class AppIcon(gtk.DrawingArea):
         else:
             bg = self.config['inactive_bg']
 
-        cr.set_source_color(gtk.gdk.color_parse(bg))
+        cr.set_source_color(bg)
         cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
         cr.fill()
 
@@ -119,8 +119,8 @@ class MainWindow(gtk.Window):
     def on_configure_event(self, widget, event):
         #self.move(gtk.gdk.screen_width() - event.width,
         #          gtk.gdk.screen_height() - event.height)
-        x = self.place_x(gtk.gdk.screen_width(), event.width)
-        y = self.place_y(gtk.gdk.screen_height(), event.height)
+        x = self.config['place_x'](gtk.gdk.screen_width(), event.width)
+        y = self.config['place_y'](gtk.gdk.screen_height(), event.height)
         self.move(x, y)
 
     def on_stdin_data(self, fd, condition):
@@ -170,8 +170,6 @@ class MainWindow(gtk.Window):
     def __init__(self, config):
         super(MainWindow, self).__init__(gtk.WINDOW_TOPLEVEL)
         self.config = config
-        self.place_x = parse_placement(config['place_x'], 'center')
-        self.place_y = parse_placement(config['place_y'], 'top')
 
         self.set_decorated(False)
         self.connect('destroy', lambda w: gtk.main_quit())
@@ -220,6 +218,12 @@ def main():
     else:
         logging.info('configuration directory not present, '
                      'using default config')
+
+    for key, fallback in ('place_x', 'center'), ('place_y', 'top'):
+        config[key] = parse_placement(config[key], fallback)
+
+    for key in 'active_bg', 'inactive_bg':
+        config[key] = gtk.gdk.color_parse(config[key])
 
     config['total_height'] = config['height'] + \
         config['icon_margin_top'] + config['icon_margin_bottom']
