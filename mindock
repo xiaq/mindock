@@ -125,6 +125,10 @@ class MainWindow(gtk.Window):
 
     def on_stdin_data(self, fd, condition):
         line = sys.stdin.readline()
+        if len(line) == 0: # EOF
+            gtk.main_quit()
+            return False
+
         try:
             wids = map(lambda s: int(s, 0), line.strip().split())
         except:
