@@ -177,7 +177,6 @@ class MainWindow(gtk.Window):
         self.modify_bg(gtk.STATE_NORMAL, config['inactive_bg'])
 
         self.connect('destroy', lambda w: gtk.main_quit())
-        self.resize()
 
         self.connect('configure-event', self.on_configure_event)
 
@@ -192,6 +191,7 @@ class MainWindow(gtk.Window):
 
         self.show_all()
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DOCK)
+        self.resize()
 
 
 def main():
