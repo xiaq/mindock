@@ -194,7 +194,6 @@ class MainWindow(gtk.Window):
 
 def main():
     logging.basicConfig(**default_config['logging'])
-    #logging.basicConfig(level=logging.WARNING)
 
     config = default_config.copy()
 
