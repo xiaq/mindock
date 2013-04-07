@@ -46,13 +46,27 @@ To use with hlwm, just run
 
     ./hlwm-monitor-wid | ./mindock
 
+## Dependencies
+
+I devloped mindock using Python 2.7.
+
+Unfortunately, since packaing of PyGTK and python-wnck are rather weird, I'm
+unable to write a suitable `setup.py` for mindock. So you have to install the
+dependencies by hand, preferably using your distro's package manager:
+
+* PyGTK
+* PyXDG
+* Python binding of libwnck
+
+On Archlinux, `pacman -S pygtk python2-xdg python2-wnck` should suffice as of
+2013-04-07.
+
 ## Roadmap
 
 It's obvious that a lot is missing, but it's already usable for me. :)
 
 Planned:
 
-* `setup.py` things
 * Prettier look (transparency, highlight effect, etc.)
 * Support simple elements other than window icons (separators, etc.)
 
