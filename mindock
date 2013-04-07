@@ -65,10 +65,11 @@ class AppIcon(gtk.DrawingArea):
             bg = config['inactive_bg']
 
         pixbuf0 = xwindow.get_icon()
+        width = pixbuf0.get_width() * height / pixbuf0.get_height()
         self.pixbuf = pixbuf0.scale_simple(
-            height, height, gtk.gdk.INTERP_HYPER)
+            width, height, gtk.gdk.INTERP_HYPER)
 
-        self.set_size_request(height, height)
+        self.set_size_request(width, height)
         self.connect('expose-event', self.on_expose)
         self.set_events(self.get_events() | gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.on_button_press)
