@@ -172,6 +172,8 @@ class MainWindow(gtk.Window):
         self.config = config
 
         self.set_decorated(False)
+        self.modify_bg(gtk.STATE_NORMAL, config['inactive_bg'])
+
         self.connect('destroy', lambda w: gtk.main_quit())
         self.resize()
 
