@@ -19,6 +19,10 @@ default_config = dict(
     inactive_bg='#ffffff',
     place_x='center',
     place_y='top',
+    icon_margin_left=2,
+    icon_margin_right=2,
+    icon_margin_top=2,
+    icon_margin_bottom=2,
     logging=dict(
         level=logging.WARNING,
         format='\033[4m%(asctime)s\033[m \033[35m%(levelname)s\033[m '
@@ -42,7 +46,8 @@ class AppIcon(gtk.DrawingArea):
         cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
         cr.fill()
 
-        cr.set_source_pixbuf(self.pixbuf, 0, 0)
+        cr.set_source_pixbuf(self.pixbuf,
+            self.config['icon_margin_left'], self.config['icon_margin_top'])
         cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
         cr.fill()
 
@@ -54,7 +59,7 @@ class AppIcon(gtk.DrawingArea):
     def __init__(self, xwindow, config):
         super(AppIcon, self).__init__()
 
-        height = config['height']
+        self.height = config['height']
 
         self.config = config
         self.xwindow = xwindow
@@ -65,11 +70,14 @@ class AppIcon(gtk.DrawingArea):
             bg = config['inactive_bg']
 
         pixbuf0 = xwindow.get_icon()
-        width = pixbuf0.get_width() * height / pixbuf0.get_height()
+        self.width = pixbuf0.get_width() * self.height / pixbuf0.get_height()
         self.pixbuf = pixbuf0.scale_simple(
-            width, height, gtk.gdk.INTERP_HYPER)
+            self.width, self.height, gtk.gdk.INTERP_HYPER)
 
-        self.set_size_request(width, height)
+        total_width = self.width + \
+            config['icon_margin_left'] + config['icon_margin_right']
+
+        self.set_size_request(total_width, config['total_height'])
         self.connect('expose-event', self.on_expose)
         self.set_events(self.get_events() | gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.on_button_press)
@@ -106,7 +114,7 @@ class MainWindow(gtk.Window):
 
     def resize(self):
         # request minumum width
-        super(MainWindow, self).resize(1, self.config['height'])
+        super(MainWindow, self).resize(1, self.config['total_height'])
 
     def on_configure_event(self, widget, event):
         #self.move(gtk.gdk.screen_width() - event.width,
@@ -212,6 +220,9 @@ def main():
     else:
         logging.info('configuration directory not present, '
                      'using default config')
+
+    config['total_height'] = config['height'] + \
+        config['icon_margin_top'] + config['icon_margin_bottom']
 
     mw = MainWindow(config)
     glib.io_add_watch(0, glib.IO_IN, mw.on_stdin_data)
