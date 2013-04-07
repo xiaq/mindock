@@ -13,10 +13,10 @@ from xdg.BaseDirectory import load_first_config
 
 
 default_config = dict(
-    height=20,
-    spacing=2,
-    active_bg='#a00000',
-    inactive_bg='#ffffff',
+    height=24,
+    spacing=0,
+    active_bg='#4b0082',
+    inactive_bg='#eeeeee',
     place_x='center',
     place_y='top',
     icon_margin_left=2,
