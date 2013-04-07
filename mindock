@@ -90,7 +90,7 @@ def parse_placement(p, fallback):
     if callable(p):
         try:
             p(768, 20)
-        except err:
+        except Exception as err:
             logging.error('Placement function throws an exception when '
                           'called with (768, 20). Falling back to %r' % (
                               p, fallback))
@@ -200,7 +200,7 @@ def main():
             user_config = {}
             try:
                 execfile(config_file, user_config)
-            except err:
+            except Exception as err:
                 logging.error('error evaluating configuration file %s, '
                               'traceback: ' % config_file)
                 logging.exception(err)
