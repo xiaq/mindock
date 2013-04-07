@@ -47,7 +47,8 @@ class AppIcon(gtk.DrawingArea):
         cr.fill()
 
         cr.set_source_pixbuf(self.icon,
-            self.config['icon_margin_left'], self.config['icon_margin_top'])
+                             self.config['icon_margin_left'],
+                             self.config['icon_margin_top'])
         cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
         cr.fill()
 
@@ -117,7 +118,7 @@ class MainWindow(gtk.Window):
 
     def on_stdin_data(self, fd, condition):
         line = sys.stdin.readline()
-        if len(line) == 0: # EOF
+        if len(line) == 0:  # EOF
             gtk.main_quit()
             return False
 
