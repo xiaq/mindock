@@ -15,8 +15,8 @@ from xdg.BaseDirectory import load_first_config
 default_config = dict(
     height=20,
     spacing=2,
-    active_bg=0x00a00000,
-    inactive_bg=0x00ffffff,
+    active_bg='#a00000',
+    inactive_bg='#ffffff',
     place_x='center',
     place_y='top',
     logging=dict(
@@ -32,6 +32,16 @@ class AppIcon(gtk.DrawingArea):
 
     def on_expose(self, widget, event):
         cr = widget.window.cairo_create()
+
+        if self.xwindow.is_active():
+            bg = self.config['active_bg']
+        else:
+            bg = self.config['inactive_bg']
+
+        cr.set_source_color(gtk.gdk.color_parse(bg))
+        cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
+        cr.fill()
+
         cr.set_source_pixbuf(self.pixbuf, 0, 0)
         cr.rectangle(0, 0, self.allocation.width, self.allocation.height)
         cr.fill()
@@ -46,6 +56,7 @@ class AppIcon(gtk.DrawingArea):
 
         height = config['height']
 
+        self.config = config
         self.xwindow = xwindow
 
         if xwindow.is_active():
@@ -53,8 +64,9 @@ class AppIcon(gtk.DrawingArea):
         else:
             bg = config['inactive_bg']
 
-        self.pixbuf = xwindow.get_icon().composite_color_simple(
-            height, height, gtk.gdk.INTERP_HYPER, 0xff, 32, bg, bg)
+        pixbuf0 = xwindow.get_icon()
+        self.pixbuf = pixbuf0.scale_simple(
+            height, height, gtk.gdk.INTERP_HYPER)
 
         self.set_size_request(height, height)
         self.connect('expose-event', self.on_expose)
