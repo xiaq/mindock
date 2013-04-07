@@ -37,7 +37,9 @@ class AppIcon(gtk.DrawingArea):
         cr.fill()
 
     def on_button_press(self, widget, event):
-        self.xwindow.activate(gtk.gdk.x11_get_server_time(self.window))
+        if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
+            timestamp = gtk.gdk.x11_get_server_time(self.window)
+            self.xwindow.activate(timestamp)
 
     def __init__(self, xwindow, config):
         super(AppIcon, self).__init__()
