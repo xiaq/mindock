@@ -48,9 +48,9 @@ To use with hlwm, just run
 
 ## Dependencies
 
-I devloped mindock using Python 2.7.
+I developed mindock using Python 2.7.
 
-Unfortunately, since packaing of PyGTK and python-wnck are rather weird, I'm
+Unfortunately, since packaging of PyGTK and python-wnck are rather weird, I'm
 unable to write a suitable `setup.py` for mindock. So you have to install the
 dependencies by hand, preferably using your distro's package manager:
 
