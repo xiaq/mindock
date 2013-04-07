@@ -7,7 +7,7 @@ Screenshot - it's quite unimpressive :) :
 
 ![mindock screenshot](https://raw.github.com/xiaq/mindock/master/screenshot.png)
 
-Windows are roxterm, firefox, kupfer and leafpad, with kupfer being the active
+Windows are roxterm, firefox, kupfer and devhelp, with kupfer being the active
 one.
 
 ## Why another dock?
