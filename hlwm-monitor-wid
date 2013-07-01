@@ -1,5 +1,8 @@
 #!/bin/bash
-herbstclient --idle '(window_title|focus)_changed' |
+{
+    echo
+    herbstclient --idle '(window_title|focus)_changed'
+} |
 while read line; do
     herbstclient dump
 done | perl -ne '$| = 1; print join(" ", m/0x[\da-f]+/g) . "\n"'
