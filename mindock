@@ -19,6 +19,10 @@ default_config = dict(
     inactive_bg='#eeeeee',
     place_x='center',
     place_y='top',
+    offset_x=0,
+    offset_y=0,
+    screen_width=None,
+    screen_height=None,
     icon_margin_left=2,
     icon_margin_right=2,
     icon_margin_top=2,
@@ -112,8 +116,12 @@ class MainWindow(gtk.Window):
         super(MainWindow, self).resize(1, self.config['total_height'])
 
     def on_configure_event(self, widget, event):
-        x = self.config['place_x'](gtk.gdk.screen_width(), event.width)
-        y = self.config['place_y'](gtk.gdk.screen_height(), event.height)
+        screen_width = self.config['screen_width'] or gtk.gdk.screen_width()
+        screen_height = self.config['screen_height'] or gtk.gdk.screen_height()
+        x = self.config['place_x'](screen_width, event.width) + \
+                self.config['offset_x']
+        y = self.config['place_y'](screen_height, event.height) + \
+                self.config['offset_y']
         self.move(x, y)
 
     def on_stdin_data(self, fd, condition):
@@ -225,6 +233,18 @@ def main():
 
     config['total_height'] = config['height'] + \
         config['icon_margin_top'] + config['icon_margin_bottom']
+
+    argv = sys.argv[1:]
+    if len(argv) == 4:
+        try:
+            config['offset_x'] = int(argv[0])
+            config['offset_y'] = int(argv[1])
+            config['screen_width'] = int(argv[2])
+            config['screen_height'] = int(argv[3])
+        except ValueError:
+            logging.error('Bad geometries: %r', argv)
+        else:
+            logging.info('Good geometries: %r', argv)
 
     mw = MainWindow(config)
     glib.io_add_watch(0, glib.IO_IN, mw.on_stdin_data)
